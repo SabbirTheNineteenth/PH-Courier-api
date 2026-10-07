@@ -79,7 +79,11 @@ export function createApp() {
   app.get(
     "/ready",
     asyncHandler(async (_req, res) => {
-      await db.$queryRaw`SELECT 1`;
+      try {
+        await db.$queryRaw`SELECT 1`;
+      } catch {
+        throw new AppError(503, "Database is not ready");
+      }
       return ok(res, { status: "ready" });
     }),
   );
@@ -108,3 +112,5 @@ export function createApp() {
   app.use(errorHandler);
   return app;
 }
+
+export default createApp();

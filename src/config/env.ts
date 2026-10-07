@@ -18,6 +18,9 @@ const schema = z.object({
   TRUST_PROXY: z.coerce.number().int().min(0).max(2).default(0),
 });
 export const env = schema.parse(process.env);
-if (env.NODE_ENV === "production" && /change|example|local-development/i.test(env.JWT_SECRET)) {
+if (
+  env.NODE_ENV === "production" &&
+  /replace|change|example|local-development|test-secret/i.test(env.JWT_SECRET)
+) {
   throw new Error("Set a random JWT_SECRET for production");
 }

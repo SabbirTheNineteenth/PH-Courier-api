@@ -1,0 +1,39 @@
+name: Backend quality and PostgreSQL acceptance
+on:
+  push:
+  pull_request:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: courier
+          POSTGRES_PASSWORD: ci-local-database-password
+          POSTGRES_DB: courier_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U courier -d courier_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://courier:ci-local-database-password@localhost:5432/courier_test
+      TEST_DATABASE_URL: postgresql://courier:ci-local-database-password@localhost:5432/courier_test
+      JWT_SECRET: ci-test-secret-not-for-production-use-at-all
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run db:migrate
+      - run: npm run check
+      - run: npm run build
+      - run: npm run docs:generate
+      - run: git diff --exit-code docs/openapi.json docs/courier.postman_collection.json docs/courier.postman_environment.json docs/ENDPOINTS.md
+      - run: npm audit --audit-level=high

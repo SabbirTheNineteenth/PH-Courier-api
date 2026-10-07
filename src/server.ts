@@ -1,11 +1,11 @@
-import { createApp } from "./app.js";
+import app from "./app.js";
 import { env } from "./config/env.js";
 import { closeCache } from "./lib/cache.js";
 import { db } from "./lib/db.js";
 import { logger } from "./lib/logger.js";
 
 await db.$connect();
-const server = createApp().listen(env.PORT, "0.0.0.0", () =>
+const server = app.listen(env.PORT, "0.0.0.0", () =>
   logger.info({ port: env.PORT }, "Courier API listening"),
 );
 let stopping = false;

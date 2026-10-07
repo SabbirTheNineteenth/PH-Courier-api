@@ -11,14 +11,17 @@
                     "build":  "prisma generate \u0026\u0026 tsc",
                     "start":  "node dist/src/server.js",
                     "typecheck":  "tsc --noEmit",
-                    "lint":  "biome check src tests prisma/seed.ts",
-                    "format":  "biome check --write src tests prisma/seed.ts",
+                    "lint":  "biome check src tests scripts prisma/seed.ts prisma.config.ts vitest.config.ts",
+                    "format":  "biome check --write src tests scripts prisma/seed.ts prisma.config.ts vitest.config.ts",
                     "test":  "vitest run",
                     "test:integration":  "vitest run tests/integration.test.ts",
                     "db:migrate":  "prisma migrate deploy",
                     "db:seed":  "tsx prisma/seed.ts",
                     "docs:generate":  "tsx scripts/generate-docs.ts",
-                    "check":  "npm run typecheck \u0026\u0026 npm run lint \u0026\u0026 npm test"
+                    "check":  "npm run typecheck \u0026\u0026 npm run lint \u0026\u0026 npm test",
+                    "config:check":  "tsx scripts/check-config.ts",
+                    "smoke:live":  "tsx scripts/smoke-live.ts",
+                    "start:local":  "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-local.ps1"
                 },
     "dependencies":  {
                          "@prisma/adapter-pg":  "^7.0.0",
@@ -39,6 +42,7 @@
                          "zod":  "^4.1.0"
                      },
     "devDependencies":  {
+                            "@apidevtools/swagger-parser":  "^13.1.0",
                             "@biomejs/biome":  "^2.3.0",
                             "@types/cors":  "^2.8.19",
                             "@types/express":  "^5.0.0",
