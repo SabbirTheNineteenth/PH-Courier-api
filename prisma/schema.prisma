@@ -1,0 +1,183 @@
+﻿generator client {
+  provider = "prisma-client"
+  output = "../src/generated/prisma"
+}
+datasource db {
+  provider = "postgresql"
+}
+enum Role {
+  CUSTOMER
+  COURIER
+  ADMIN
+}
+enum ShipmentStatus {
+  CREATED
+  ASSIGNED
+  PICKED_UP
+  AT_ORIGIN_HUB
+  IN_TRANSIT
+  AT_DESTINATION_HUB
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED_DELIVERY
+  RETURNING
+  RETURNED
+  CANCELLED
+}
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  email String @unique
+  name String
+  phone String?
+  passwordHash String?
+  googleId String? @unique
+  role Role @default(CUSTOMER)
+  isActive Boolean @default(true)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  addresses Address[]
+  shipments Shipment[] @relation("customer")
+  deliveries Shipment[] @relation("courier")
+  refreshTokens RefreshToken[]
+  events ShipmentEvent[]
+  auditLogs AuditLog[]
+  @@index([role, isActive, deletedAt])
+}
+model RefreshToken {
+  id String @id @default(uuid()) @db.Uuid
+  tokenHash String @unique
+  userId String @db.Uuid
+  user User @relation(fields:[userId], references:[id])
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}
+model Zone {
+  id String @id @default(uuid()) @db.Uuid
+  name String @unique
+  basePrice Int
+  perKgPrice Int
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  hubs Hub[]
+  addresses Address[]
+  originShipments Shipment[] @relation("origin")
+  destinationShipments Shipment[] @relation("destination")
+}
+model Hub {
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  address String
+  zoneId String @db.Uuid
+  zone Zone @relation(fields:[zoneId], references:[id])
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  shipments Shipment[]
+  @@unique([zoneId, name])
+  @@index([zoneId, deletedAt])
+}
+model Address {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  user User @relation(fields:[userId], references:[id])
+  label String
+  contactName String
+  contactPhone String
+  line String
+  zoneId String @db.Uuid
+  zone Zone @relation(fields:[zoneId], references:[id])
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([userId, deletedAt])
+}
+model Shipment {
+  id String @id @default(uuid()) @db.Uuid
+  trackingNumber String @unique
+  customerId String @db.Uuid
+  customer User @relation("customer", fields:[customerId], references:[id])
+  courierId String? @db.Uuid
+  courier User? @relation("courier", fields:[courierId], references:[id])
+  originZoneId String @db.Uuid
+  originZone Zone @relation("origin", fields:[originZoneId], references:[id])
+  destinationZoneId String @db.Uuid
+  destinationZone Zone @relation("destination", fields:[destinationZoneId], references:[id])
+  currentHubId String? @db.Uuid
+  currentHub Hub? @relation(fields:[currentHubId], references:[id])
+  pickupAddress Json
+  deliveryAddress Json
+  parcelDescription String
+  weightGrams Int
+  pickupDate DateTime
+  price Int
+  currency String @default("bdt")
+  status ShipmentStatus @default(CREATED)
+  version Int @default(0)
+  deliveryAttempts Int @default(0)
+  deliveredAt DateTime?
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  events ShipmentEvent[]
+  payment Payment?
+  @@index([customerId, deletedAt, createdAt])
+  @@index([courierId, status, deletedAt])
+  @@index([status, createdAt])
+  @@index([originZoneId])
+  @@index([destinationZoneId])
+  @@index([currentHubId])
+}
+model ShipmentEvent {
+  id String @id @default(uuid()) @db.Uuid
+  shipmentId String @db.Uuid
+  shipment Shipment @relation(fields:[shipmentId], references:[id])
+  actorId String @db.Uuid
+  actor User @relation(fields:[actorId], references:[id])
+  status ShipmentStatus
+  note String?
+  hubId String? @db.Uuid
+  createdAt DateTime @default(now())
+  @@index([shipmentId, createdAt])
+}
+model Payment {
+  id String @id @default(uuid()) @db.Uuid
+  shipmentId String @unique @db.Uuid
+  shipment Shipment @relation(fields:[shipmentId], references:[id])
+  amount Int
+  currency String
+  status PaymentStatus @default(PENDING)
+  attempt Int @default(1)
+  providerSessionId String? @unique
+  checkoutUrl String?
+  paidAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([status, createdAt])
+}
+model WebhookEvent {
+  id String @id
+  type String
+  processedAt DateTime @default(now())
+}
+model AuditLog {
+  id String @id @default(uuid()) @db.Uuid
+  actorId String? @db.Uuid
+  actor User? @relation(fields:[actorId], references:[id])
+  action String
+  resourceType String
+  resourceId String
+  details Json?
+  createdAt DateTime @default(now())
+  @@index([createdAt])
+  @@index([resourceType, resourceId])
+}
