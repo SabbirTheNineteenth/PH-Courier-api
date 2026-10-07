@@ -1,5 +1,6 @@
 import type Stripe from "stripe";
 import { env } from "../../config/env.js";
+import { Prisma } from "../../generated/prisma/client.js";
 import { audit } from "../../lib/audit.js";
 import { db, type Tx, transaction } from "../../lib/db.js";
 import { getStripe } from "../../lib/stripe.js";
@@ -49,30 +50,40 @@ export async function applySession(tx: Tx, session: Stripe.Checkout.Session) {
 }
 export async function initiate(user: Actor, shipmentId: string) {
   const stripe = getStripe();
-  const payment = await transaction(async (tx) => {
-    const shipment = await ownedShipment(tx, user, shipmentId);
-    if (shipment.status !== "CREATED")
-      throw new AppError(409, "Only a newly created shipment can be paid");
-    if (shipment.payment) {
-      if (["PAID", "REFUND_PENDING", "REFUNDED"].includes(shipment.payment.status))
-        throw new AppError(409, "Shipment already paid or refunded");
-      if (shipment.payment.status === "CANCELLED")
-        return tx.payment.update({
-          where: { id: shipment.payment.id },
-          data: {
-            status: "PENDING",
-            attempt: { increment: 1 },
-            providerSessionId: null,
-            checkoutUrl: null,
-          },
-        });
-      return shipment.payment;
-    }
-    const result = await tx.payment.create({
-      data: { shipmentId, amount: shipment.price, currency: shipment.currency },
+  const reserve = () =>
+    transaction(async (tx) => {
+      const shipment = await ownedShipment(tx, user, shipmentId);
+      if (shipment.status !== "CREATED")
+        throw new AppError(409, "Only a newly created shipment can be paid");
+      if (shipment.payment) {
+        if (["PAID", "REFUND_PENDING", "REFUNDED"].includes(shipment.payment.status))
+          throw new AppError(409, "Shipment already paid or refunded");
+        if (shipment.payment.status === "CANCELLED")
+          return tx.payment.update({
+            where: { id: shipment.payment.id },
+            data: {
+              status: "PENDING",
+              attempt: { increment: 1 },
+              providerSessionId: null,
+              checkoutUrl: null,
+            },
+          });
+        return shipment.payment;
+      }
+      const result = await tx.payment.create({
+        data: { shipmentId, amount: shipment.price, currency: shipment.currency },
+      });
+      await audit(tx, user.id, "payment.initiated", "Payment", result.id);
+      return result;
     });
-    await audit(tx, user.id, "payment.initiated", "Payment", result.id);
-    return result;
+  const payment = await reserve().catch(async (error: unknown) => {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002" &&
+      (await db.payment.findUnique({ where: { shipmentId } }))
+    )
+      return reserve();
+    throw error;
   });
   if (payment.providerSessionId && payment.checkoutUrl) {
     const session = await stripe.checkout.sessions.retrieve(payment.providerSessionId);

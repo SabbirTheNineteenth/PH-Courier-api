@@ -11,6 +11,8 @@ import { getStripe } from "../src/lib/stripe.js";
 const app = createApp();
 const stripe = getStripe();
 const sessions = new Map<string, Stripe.Checkout.Session>();
+const refunds = new Map<string, Stripe.Refund>();
+let failNextRefund = false;
 let created = 0;
 let customer = "";
 let other = "";
@@ -120,13 +122,26 @@ beforeAll(async () => {
   });
   vi.spyOn(stripe.refunds, "create").mockImplementation(async (...args: unknown[]) => {
     const params = args[0] as Stripe.RefundCreateParams;
-    return {
-      id: "re_test_success",
-      status: "succeeded",
+    const metadata = (params.metadata || {}) as Record<string, string>;
+    const id = `re_${metadata.paymentId}_${metadata.refundAttempt}`;
+    const existing = refunds.get(id);
+    if (existing) return existing as never;
+    const refund = {
+      id,
+      status: failNextRefund ? "failed" : "succeeded",
+      failure_reason: failNextRefund ? "declined" : null,
       amount: params.amount,
       currency: "bdt",
       metadata: params.metadata,
-    } as never;
+    } as unknown as Stripe.Refund;
+    failNextRefund = false;
+    refunds.set(id, refund);
+    return refund as never;
+  });
+  vi.spyOn(stripe.refunds, "retrieve").mockImplementation(async (id) => {
+    const refund = refunds.get(id);
+    if (!refund) throw new Error("Missing refund");
+    return refund as never;
   });
   const first = await register("customer@test.example");
   customer = first.accessToken;
@@ -570,5 +585,120 @@ describe.sequential("real PostgreSQL API acceptance", () => {
       Object.values(docs.body.paths).flatMap((v) => Object.keys(v as object)).length,
     ).toBeGreaterThanOrEqual(40);
     expect((await request(app).get("/ready")).status).toBe(200);
+  });
+  it("retains immutable shipment address snapshots after address updates", async () => {
+    const shipment = await createParcel();
+    const oldLine = shipment.pickupAddress.line;
+    const updated = await request(app)
+      .patch(`/api/v1/addresses/${pickupId}`)
+      .set(auth(customer))
+      .send({ line: "New location, House 99" });
+    expect(updated.status).toBe(200);
+    const saved = await request(app).get(`/api/v1/shipments/${shipment.id}`).set(auth(customer));
+    expect(saved.body.data.pickupAddress.line).toBe(oldLine);
+    expect(
+      (await request(app).delete(`/api/v1/shipments/${shipment.id}`).set(auth(customer))).status,
+    ).toBe(409);
+    expect(
+      (
+        await request(app)
+          .post(`/api/v1/shipments/${shipment.id}/cancel`)
+          .set(auth(customer))
+          .send({ reason: "Snapshot test complete", expectedVersion: 0 })
+      ).status,
+    ).toBe(200);
+  });
+  it("retries a provider-confirmed failed refund without marking it paid back early", async () => {
+    const shipment = await createParcel();
+    const payment = await pay(shipment.id);
+    failNextRefund = true;
+    const failed = await request(app)
+      .post(`/api/v1/payments/${payment.id}/refund`)
+      .set(auth(admin))
+      .send({ reason: "Refund failure scenario" });
+    expect(failed.status).toBe(502);
+    const pending = await db.payment.findUniqueOrThrow({ where: { id: payment.id } });
+    expect(pending.status).toBe("REFUND_PENDING");
+    expect(pending.refundFailure).toBe("declined");
+    const retry = await request(app)
+      .post(`/api/v1/payments/${payment.id}/refund`)
+      .set(auth(admin))
+      .send({ reason: "Retry confirmed failed refund" });
+    expect(retry.status).toBe(200);
+    expect(retry.body.data.status).toBe("REFUNDED");
+    expect(retry.body.data.refundAttempt).toBe(2);
+  });
+  it("enforces three failed delivery attempts followed by return-to-sender", async () => {
+    const shipment = await createParcel();
+    await pay(shipment.id);
+    const assigned = await request(app)
+      .post(`/api/v1/shipments/${shipment.id}/assign`)
+      .set(auth(admin))
+      .send({ courierId: courier2Id, expectedVersion: 0 });
+    expect(assigned.status).toBe(200);
+    let currentVersion = assigned.body.data.version;
+    const step = async (status: string, extra = {}) => {
+      const response = await request(app)
+        .patch(`/api/v1/shipments/${shipment.id}/status`)
+        .set(auth(courier2))
+        .send({ status, expectedVersion: currentVersion, ...extra });
+      expect(response.status, JSON.stringify(response.body)).toBe(200);
+      currentVersion = response.body.data.version;
+      return response;
+    };
+    await step("PICKED_UP");
+    await step("AT_ORIGIN_HUB", { hubId });
+    expect((await request(app).delete(`/api/v1/hubs/${hubId}`).set(auth(admin))).status).toBe(409);
+    expect((await request(app).delete(`/api/v1/zones/${zoneId}`).set(auth(admin))).status).toBe(
+      409,
+    );
+    await step("IN_TRANSIT");
+    await step("AT_DESTINATION_HUB", { hubId: hub2Id });
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      await step("OUT_FOR_DELIVERY");
+      await step("FAILED_DELIVERY", { note: "Recipient unavailable" });
+    }
+    const fourth = await request(app)
+      .patch(`/api/v1/shipments/${shipment.id}/status`)
+      .set(auth(courier2))
+      .send({ status: "OUT_FOR_DELIVERY", expectedVersion: currentVersion });
+    expect(fourth.status).toBe(409);
+    await step("RETURNING", { note: "Maximum attempts reached" });
+    const returned = await step("RETURNED", { note: "Returned to original sender" });
+    expect(returned.body.data.deliveryAttempts).toBe(3);
+  });
+  it("cannot overbook a courier when two assignments compete for the last slot", async () => {
+    for (let index = 0; index < 9; index++) {
+      const shipment = await createParcel();
+      await pay(shipment.id);
+      const response = await request(app)
+        .post(`/api/v1/shipments/${shipment.id}/assign`)
+        .set(auth(admin))
+        .send({ courierId, expectedVersion: 0 });
+      expect(response.status).toBe(200);
+    }
+    const first = await createParcel();
+    const second = await createParcel();
+    await pay(first.id);
+    await pay(second.id);
+    const responses = await Promise.all([
+      request(app)
+        .post(`/api/v1/shipments/${first.id}/assign`)
+        .set(auth(admin))
+        .send({ courierId, expectedVersion: 0 }),
+      request(app)
+        .post(`/api/v1/shipments/${second.id}/assign`)
+        .set(auth(admin))
+        .send({ courierId, expectedVersion: 0 }),
+    ]);
+    expect(responses.map((r) => r.status).sort()).toEqual([200, 409]);
+    const total = await db.shipment.count({
+      where: { courierId, status: { notIn: ["DELIVERED", "RETURNED", "CANCELLED"] } },
+    });
+    expect(total).toBe(10);
+    const roster = await request(app).get("/api/v1/couriers").set(auth(admin));
+    expect(
+      roster.body.data.items.find((item: { id: string }) => item.id === courierId).available,
+    ).toBe(false);
   });
 });

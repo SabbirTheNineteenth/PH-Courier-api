@@ -129,7 +129,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"label\": \"Home\",\n  \"contactName\": \"Demo Receiver\",\n  \"contactPhone\": \"01712345678\",\n  \"line\": \"House 10, Road 3, Dhaka\",\n  \"zoneId\": \"{{originZoneId}}\"\n}",
+              "raw": "{\n  \"label\": \"Home\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -305,7 +305,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"role\": \"COURIER\",\n  \"isActive\": true\n}",
+              "raw": "{\n  \"role\": \"COURIER\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -464,7 +464,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\",\n  \"name\": \"Demo Customer\",\n  \"phone\": \"01712345678\"\n}",
+              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\",\n  \"name\": \"Demo Customer\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -962,7 +962,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Demo Customer\",\n  \"address\": \"example\"\n}",
+              "raw": "{\n  \"name\": \"Demo Customer\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1557,7 +1557,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"parcelDescription\": \"Books and documents\",\n  \"pickupDate\": \"{{pickupDate}}\",\n  \"expectedVersion\": {{shipmentVersion}}\n}",
+              "raw": "{\n  \"parcelDescription\": \"Books and documents\",\n  \"expectedVersion\": {{shipmentVersion}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1691,7 +1691,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"PICKED_UP\",\n  \"hubId\": \"{{originHubId}}\",\n  \"note\": \"Received by named recipient\",\n  \"expectedVersion\": {{shipmentVersion}}\n}",
+              "raw": "{\n  \"status\": \"PICKED_UP\",\n  \"expectedVersion\": {{shipmentVersion}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1830,7 +1830,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Demo Customer\",\n  \"phone\": \"01712345678\"\n}",
+              "raw": "{\n  \"name\": \"Demo Customer\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1968,7 +1968,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Demo Customer\",\n  \"basePrice\": 6000,\n  \"perKgPrice\": 2000\n}",
+              "raw": "{\n  \"name\": \"Demo Customer\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
