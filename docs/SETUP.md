@@ -43,7 +43,7 @@ References: [Stripe webhooks](https://docs.stripe.com/webhooks), [Stripe testing
 ## Render (primary deployment path)
 
 1. Push this complete Git history to your own GitHub repository. Create a Render Node web service from it, or import the included `render.yaml` blueprint. The blueprint selects the free web-service plan and expects an independently supplied PostgreSQL database URL; it does not create a paid database.
-2. Build command: `npm ci && npm run build`. Start command: `npm run db:migrate && npm run db:seed && npm start`. Health path: `/ready`. Node: `24.15.0`.
+2. Build command: `npm ci --include=dev && npm run build`. Start command: `npm run db:migrate && npm run db:seed && npm start`. Health path: `/ready`. Node: `24.15.0`.
 3. Set production `DATABASE_URL`, `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `GOOGLE_CLIENT_ID`, Stripe keys, callback URLs, and CORS origins. Use a dedicated evaluation admin. Set `NODE_ENV=production` and `TRUST_PROXY=1` behind Render's single trusted proxy.
 4. Use PostgreSQL TLS settings required by your provider. If runtime uses a pooler, set `DIRECT_URL` to its migration-capable direct connection.
 5. Visit `/ready` and `/docs` on the assigned HTTPS URL. Register the exact live Stripe webhook URL and obtain its signing secret.

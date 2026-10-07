@@ -3,7 +3,7 @@ services:
     name: ph-courier-api
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm run db:migrate && npm run db:seed && npm start
     healthCheckPath: /ready
     envVars:

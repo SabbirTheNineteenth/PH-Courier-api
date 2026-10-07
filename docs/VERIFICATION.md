@@ -1,0 +1,25 @@
+# Local verification record
+
+Verified on 7 October 2026 in `D:\PH\courier-backend` with Node 24.15.0, PostgreSQL 18.4, and Prisma 7.10.0.
+
+| Check | Authoritative result |
+|---|---|
+| `npm run check` | TypeScript passed; Biome passed for source/tests/scripts/config; 3 source test files, **27 tests passed** |
+| `npm run build` | Prisma client generated and TypeScript compiled successfully |
+| `prisma migrate status` | Two migrations applied; database schema up to date |
+| `prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code` | No difference detected |
+| `npm audit --audit-level=high` | Zero vulnerabilities reported |
+| `npm run docs:generate` | 46 application endpoints; OpenAPI, Postman collection/environment, and inventory generated |
+| OpenAPI validation | Resource references resolved and document validated in tests |
+| Postman validation | Coverage checked; every generated request body template tested against its runtime Zod schema |
+| Compiled server HTTP smoke | `/health`, `/ready`, `/docs/`, OpenAPI, seeded ADMIN login/permissions, 401 protection, validation, logout passed |
+| Missing-provider behavior | Google endpoint returned structured 503; configuration helper reports Google/Stripe keys missing |
+| Git/secret handling | More than 20 meaningful commits; private `.env` and `.local` are ignored |
+
+The API is running locally at `http://127.0.0.1:4000`, with Swagger at `http://127.0.0.1:4000/docs`. Use `npm run start:local` after a restart. Admin credentials remain only in the private `.env`.
+
+The isolated development database is `courier`; automated tests use and clear `courier_test`. PostgreSQL binds only to loopback port 55432, separate from the machine's existing PostgreSQL service.
+
+External Google and Stripe calls are mocked inside automated tests. The production code calls the actual provider libraries and has no fake-payment route. Real GCP login, Stripe provider payment/refund, public deployment, and external CI execution remain unverified until credentials/hosting are configured. Optional Redis is implemented but no live Redis instance is configured locally.
+
+Refer to [REQUIREMENTS.md](REQUIREMENTS.md) for the complete requirement audit and [SETUP.md](SETUP.md) for the remaining account/deployment checks. The presentation/video is user-owned.
