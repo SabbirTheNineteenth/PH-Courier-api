@@ -1,0 +1,24 @@
+﻿import { createModule } from "../../lib/routes.js";
+import { db, transaction } from "../../lib/db.js";
+import { idParams } from "../../lib/validation.js";
+import { actor } from "../../middleware/auth.js";
+import { AppError, ok } from "../../middleware/http.js";
+import { z } from "zod";
+import { quoteSchema, createShipmentSchema, listSchema, assignSchema, statusSchema, cancelSchema } from "./shipment.rules.js";
+import { quote, createShipment, listShipments, getShipment, updateShipment, updateSchema, deleteShipment } from "./shipment.service.js";
+import { assignCourier, updateStatus, cancelShipment } from "./workflow.service.js";
+const { router, endpoint } = createModule("/shipments");
+endpoint("post", "/quote", { summary: "Calculate a delivery fee in paisa", roles: ["CUSTOMER", "ADMIN"], body: quoteSchema }, async (req, res) => ok(res, await transaction(tx => quote(tx, req.body))));
+endpoint("get", "/track/:trackingNumber", { summary: "Public tracking with no customer contact details", params: z.object({ trackingNumber: z.string().regex(/^PH-[A-F0-9]{24}$/) }) }, async (req, res) => {
+  const shipment = await db.shipment.findFirst({ where: { trackingNumber: String(req.params.trackingNumber), deletedAt: null }, select: { trackingNumber: true, status: true, createdAt: true, deliveredAt: true, events: { select: { status: true, createdAt: true }, orderBy: { createdAt: "asc" } } } });
+  if (!shipment) throw new AppError(404, "Shipment not found"); return ok(res, shipment);
+});
+endpoint("post", "/", { summary: "Create a shipment using owned saved addresses", roles: ["CUSTOMER"], body: createShipmentSchema, status: 201 }, async (req, res) => ok(res, await createShipment(actor(res), req.body), "Shipment created", 201));
+endpoint("get", "/", { summary: "List visible shipments with search, status filtering and pagination", roles: ["CUSTOMER", "COURIER", "ADMIN"], query: listSchema }, async (_req, res) => ok(res, await listShipments(actor(res), listSchema.parse(res.locals.query))));
+endpoint("get", "/:id", { summary: "Get a visible shipment and tracking history", roles: ["CUSTOMER", "COURIER", "ADMIN"], params: idParams }, async (req, res) => ok(res, await getShipment(actor(res), String(req.params.id))));
+endpoint("patch", "/:id", { summary: "Edit own shipment before opening payment", roles: ["CUSTOMER"], params: idParams, body: updateSchema }, async (req, res) => ok(res, await updateShipment(actor(res), String(req.params.id), req.body), "Shipment updated"));
+endpoint("delete", "/:id", { summary: "Archive a terminal shipment using soft deletion", roles: ["CUSTOMER", "ADMIN"], params: idParams }, async (req, res) => { await deleteShipment(actor(res), String(req.params.id)); return ok(res, null, "Shipment archived"); });
+endpoint("post", "/:id/assign", { summary: "Assign or reassign an available courier", roles: ["ADMIN"], params: idParams, body: assignSchema }, async (req, res) => ok(res, await assignCourier(actor(res), String(req.params.id), req.body), "Courier assigned"));
+endpoint("patch", "/:id/status", { summary: "Advance an assigned shipment through valid states", roles: ["COURIER", "ADMIN"], params: idParams, body: statusSchema }, async (req, res) => ok(res, await updateStatus(actor(res), String(req.params.id), req.body), "Shipment status updated"));
+endpoint("post", "/:id/cancel", { summary: "Cancel an unpaid shipment before pickup", roles: ["CUSTOMER", "ADMIN"], params: idParams, body: cancelSchema }, async (req, res) => ok(res, await cancelShipment(actor(res), String(req.params.id), req.body), "Shipment cancelled"));
+export default router;
