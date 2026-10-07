@@ -1,0 +1,15 @@
+﻿import { rateLimit } from "express-rate-limit";
+import { createModule } from "../../lib/routes.js";
+import { actor } from "../../middleware/auth.js";
+import { ok } from "../../middleware/http.js";
+import { register, login, refresh, logout, registerSchema, loginSchema, refreshSchema } from "./auth.service.js";
+import { googleLogin, linkGoogle, googleSchema } from "./google.service.js";
+const { router, endpoint } = createModule("/auth");
+const limiter = rateLimit({ windowMs: 15 * 60000, limit: 30, standardHeaders: "draft-8", legacyHeaders: false, handler: (_req, res) => res.status(429).json({ success: false, message: "Too many authentication attempts", errors: [] }) });
+endpoint("post", "/register", { summary: "Register a customer", body: registerSchema, status: 201, middleware: [limiter], example: { name: "Demo Customer", email: "customer@example.com", password: "CustomerDemo!2026" } }, async (req, res) => ok(res, await register(req.body), "Account created", 201));
+endpoint("post", "/login", { summary: "Sign in with email and password", body: loginSchema, middleware: [limiter], example: { email: "customer@example.com", password: "CustomerDemo!2026" } }, async (req, res) => ok(res, await login(req.body), "Signed in"));
+endpoint("post", "/refresh-token", { summary: "Rotate a single-use refresh token", body: refreshSchema, middleware: [limiter] }, async (req, res) => ok(res, await refresh(req.body.refreshToken), "Token refreshed"));
+endpoint("post", "/logout", { summary: "Revoke a refresh token", body: refreshSchema }, async (req, res) => { await logout(req.body.refreshToken); return ok(res, null, "Signed out; access token expires within 15 minutes"); });
+endpoint("post", "/google", { summary: "Sign in with a verified Google ID token", body: googleSchema, middleware: [limiter] }, async (req, res) => ok(res, await googleLogin(req.body.idToken), "Signed in with Google"));
+endpoint("post", "/google/link", { summary: "Link Google to the signed-in account", body: googleSchema, roles: ["CUSTOMER", "COURIER", "ADMIN"] }, async (req, res) => ok(res, await linkGoogle(actor(res).id, req.body.idToken), "Google linked"));
+export default router;
