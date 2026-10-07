@@ -1,4 +1,4 @@
-﻿import { defineConfig } from "vitest/config";
+import { defineConfig } from "vitest/config";
 import dotenv from "dotenv";
 import { readFileSync, existsSync } from "node:fs";
 const local = existsSync(".env") ? dotenv.parse(readFileSync(".env")) : {};

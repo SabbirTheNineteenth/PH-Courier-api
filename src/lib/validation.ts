@@ -1,4 +1,4 @@
-﻿import { z } from "zod";
+import { z } from "zod";
 export const uuid = z.uuid();
 export const idParams = z.object({ id: uuid });
 export const pagination = z.object({
@@ -7,5 +7,18 @@ export const pagination = z.object({
   search: z.string().trim().max(100).optional(),
   sort: z.enum(["asc", "desc"]).default("desc"),
 });
-export const pageMeta = (page: number, limit: number, total: number) => ({ page, limit, total, totalPages: Math.ceil(total / limit) });
-export const userSelect = { id: true, email: true, name: true, phone: true, role: true, isActive: true, createdAt: true } as const;
+export const pageMeta = (page: number, limit: number, total: number) => ({
+  page,
+  limit,
+  total,
+  totalPages: Math.ceil(total / limit),
+});
+export const userSelect = {
+  id: true,
+  email: true,
+  name: true,
+  phone: true,
+  role: true,
+  isActive: true,
+  createdAt: true,
+} as const;

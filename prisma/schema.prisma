@@ -163,6 +163,8 @@ model Payment {
   checkoutUrl String?
   paidAt DateTime?
   providerRefundId String? @unique
+  refundAttempt Int @default(1)
+  refundFailure String?
   refundedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
