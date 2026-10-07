@@ -1,0 +1,2035 @@
+{
+  "info": {
+    "name": "PH Courier & Logistics API",
+    "description": "Complete endpoint reference for 3 roles. Run requests in the workflow order in docs/API.md. This collection is for interactive testing; payment completion requires a real Stripe Checkout session. No fake payment endpoint exists.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.environment.set(\"pickupDate\", new Date(Date.now() + 86400000).toISOString());"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "addresses",
+      "item": [
+        {
+          "name": "POST Create a saved customer address",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/addresses",
+            "description": "Create a saved customer address. Roles: CUSTOMER. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Home\",\n  \"contactName\": \"Demo Receiver\",\n  \"contactPhone\": \"01712345678\",\n  \"line\": \"House 10, Road 3, Dhaka\",\n  \"zoneId\": \"{{originZoneId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(201));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "pm.environment.set(\"addressId\", data.id); if (!pm.environment.get(\"pickupAddressId\")) pm.environment.set(\"pickupAddressId\", data.id); else pm.environment.set(\"deliveryAddressId\", data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET List own saved addresses",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/addresses",
+            "description": "List own saved addresses. Roles: CUSTOMER. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH Update own saved address",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/addresses/{{addressId}}",
+            "description": "Update own saved address. Roles: CUSTOMER. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Home\",\n  \"contactName\": \"Demo Receiver\",\n  \"contactPhone\": \"01712345678\",\n  \"line\": \"House 10, Road 3, Dhaka\",\n  \"zoneId\": \"{{originZoneId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Soft-delete own saved address",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/addresses/{{addressId}}",
+            "description": "Soft-delete own saved address. Roles: CUSTOMER. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "admin",
+      "item": [
+        {
+          "name": "GET List users with pagination search and role filtering",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/admin/users?page=1&limit=10&sort=desc",
+            "description": "List users with pagination search and role filtering. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create a courier account; public registration cannot choose a role",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/admin/couriers",
+            "description": "Create a courier account; public registration cannot choose a role. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo Courier\",\n  \"email\": \"{{courierEmail}}\",\n  \"password\": \"{{courierPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(201));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "pm.environment.set(\"courierId\", data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH Change user role or suspend account with workload safeguards",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/admin/users/{{targetUserId}}",
+            "description": "Change user role or suspend account with workload safeguards. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"COURIER\",\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Soft-delete an account after its shipments are resolved",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/admin/users/{{targetUserId}}",
+            "description": "Soft-delete an account after its shipments are resolved. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Inspect critical action audit logs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/admin/audit-logs?page=1&limit=10&sort=desc",
+            "description": "Inspect critical action audit logs. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Summarize shipment operations and verified revenue",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/admin/statistics",
+            "description": "Summarize shipment operations and verified revenue. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "POST Register a customer",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "description": "Register a customer. Public. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\",\n  \"name\": \"Demo Customer\",\n  \"phone\": \"01712345678\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(201));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.accessToken) pm.environment.set(\"customerToken\", data.accessToken);",
+                  "if (data.refreshToken) pm.environment.set(\"refreshToken\", data.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Sign in with email and password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "description": "Sign in with email and password. Public. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.accessToken) pm.environment.set(\"customerToken\", data.accessToken);",
+                  "if (data.refreshToken) pm.environment.set(\"refreshToken\", data.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Rotate a single-use refresh token",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/refresh-token",
+            "description": "Rotate a single-use refresh token. Public. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.accessToken) pm.environment.set(\"customerToken\", data.accessToken);",
+                  "if (data.refreshToken) pm.environment.set(\"refreshToken\", data.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Revoke a refresh token",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/logout",
+            "description": "Revoke a refresh token. Public. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Sign in with a verified Google ID token",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/google",
+            "description": "Sign in with a verified Google ID token. Public. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"{{googleIdToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.accessToken) pm.environment.set(\"customerToken\", data.accessToken);",
+                  "if (data.refreshToken) pm.environment.set(\"refreshToken\", data.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Link Google to the signed-in account",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/google/link",
+            "description": "Link Google to the signed-in account. Roles: CUSTOMER, COURIER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"{{googleIdToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sign in as admin",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Signed in\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); if (result.success) pm.environment.set(\"adminToken\", result.data.accessToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sign in as courier",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{courierEmail}}\",\n  \"password\": \"{{courierPassword}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Signed in\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); if (result.success) pm.environment.set(\"courierToken\", result.data.accessToken);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "couriers",
+      "item": [
+        {
+          "name": "GET List available couriers and current workload",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/couriers?page=1&limit=10&sort=desc",
+            "description": "List available couriers and current workload. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Get own assigned shipment totals by state",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/couriers/me/statistics",
+            "description": "Get own assigned shipment totals by state. Roles: COURIER. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{courierToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hubs",
+      "item": [
+        {
+          "name": "GET List hubs with pagination and zone filtering",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/hubs?page=1&limit=10&sort=desc",
+            "description": "List hubs with pagination and zone filtering. Roles: CUSTOMER, COURIER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.items[0]) pm.environment.set(\"originHubId\", data.items[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create a hub inside an active zone",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/hubs",
+            "description": "Create a hub inside an active zone. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo Customer\",\n  \"address\": \"example\",\n  \"zoneId\": \"{{originZoneId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(201));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH Update hub details",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/hubs/{{originHubId}}",
+            "description": "Update hub details. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo Customer\",\n  \"address\": \"example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Retire a hub with no active shipments",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/hubs/{{originHubId}}",
+            "description": "Retire a hub with no active shipments. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "payments",
+      "item": [
+        {
+          "name": "GET Checkout return notice; authenticated verification is still required",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/payments/success",
+            "description": "Checkout return notice; authenticated verification is still required. Public. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Checkout cancellation notice; does not change financial state",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/payments/cancel",
+            "description": "Checkout cancellation notice; does not change financial state. Public. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Open or reuse a real Stripe Checkout session",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/payments/initiate",
+            "description": "Open or reuse a real Stripe Checkout session. Roles: CUSTOMER. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipmentId\": \"{{shipmentId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "pm.environment.set(\"paymentId\", data.id); if (data.checkoutUrl) pm.environment.set(\"checkoutUrl\", data.checkoutUrl);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Get own payment state",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/payments/{{paymentId}}",
+            "description": "Get own payment state. Roles: CUSTOMER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Verify payment directly with Stripe",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/payments/{{paymentId}}/verify",
+            "description": "Verify payment directly with Stripe. Roles: CUSTOMER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Expire unpaid Stripe checkout before cancelling or retrying",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/payments/{{paymentId}}/expire",
+            "description": "Expire unpaid Stripe checkout before cancelling or retrying. Roles: CUSTOMER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Refund and cancel a paid shipment before pickup",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/payments/{{paymentId}}/refund",
+            "description": "Refund and cancel a paid shipment before pickup. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Customer requested cancellation\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stripe webhook (use Stripe CLI; signatures cannot be invented)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/payments/webhook",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "stripe-signature",
+                "value": "{{stripeSignature}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "description": "Use Stripe CLI or Stripe dashboard to send the exact signed raw event. This placeholder is expected to fail signature validation."
+          }
+        }
+      ]
+    },
+    {
+      "name": "shipments",
+      "item": [
+        {
+          "name": "POST Calculate a delivery fee in paisa",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/shipments/quote",
+            "description": "Calculate a delivery fee in paisa. Roles: CUSTOMER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"originZoneId\": \"{{originZoneId}}\",\n  \"destinationZoneId\": \"{{destinationZoneId}}\",\n  \"weightGrams\": 1200\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Public tracking with no customer contact details",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/shipments/track/{{trackingNumber}}",
+            "description": "Public tracking with no customer contact details. Public. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create a shipment using owned saved addresses",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/shipments",
+            "description": "Create a shipment using owned saved addresses. Roles: CUSTOMER. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickupAddressId\": \"{{pickupAddressId}}\",\n  \"deliveryAddressId\": \"{{deliveryAddressId}}\",\n  \"parcelDescription\": \"Books and documents\",\n  \"weightGrams\": 1200,\n  \"pickupDate\": \"{{pickupDate}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(201));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.id) { pm.environment.set(\"shipmentId\", data.id); pm.environment.set(\"trackingNumber\", data.trackingNumber); pm.environment.set(\"shipmentVersion\", data.version); }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET List visible shipments with search, status filtering and pagination",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/shipments?page=1&limit=10&sort=desc",
+            "description": "List visible shipments with search, status filtering and pagination. Roles: CUSTOMER, COURIER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.id) { pm.environment.set(\"shipmentId\", data.id); pm.environment.set(\"trackingNumber\", data.trackingNumber); pm.environment.set(\"shipmentVersion\", data.version); }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Get a visible shipment and tracking history",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/shipments/{{shipmentId}}",
+            "description": "Get a visible shipment and tracking history. Roles: CUSTOMER, COURIER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.id) { pm.environment.set(\"shipmentId\", data.id); pm.environment.set(\"trackingNumber\", data.trackingNumber); pm.environment.set(\"shipmentVersion\", data.version); }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH Edit own shipment before opening payment",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/shipments/{{shipmentId}}",
+            "description": "Edit own shipment before opening payment. Roles: CUSTOMER. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parcelDescription\": \"Books and documents\",\n  \"pickupDate\": \"{{pickupDate}}\",\n  \"expectedVersion\": {{shipmentVersion}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.id) { pm.environment.set(\"shipmentId\", data.id); pm.environment.set(\"trackingNumber\", data.trackingNumber); pm.environment.set(\"shipmentVersion\", data.version); }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Archive a terminal shipment using soft deletion",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/shipments/{{shipmentId}}",
+            "description": "Archive a terminal shipment using soft deletion. Roles: CUSTOMER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Assign or reassign an available courier",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/shipments/{{shipmentId}}/assign",
+            "description": "Assign or reassign an available courier. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courierId\": \"{{courierId}}\",\n  \"expectedVersion\": {{shipmentVersion}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.id) { pm.environment.set(\"shipmentId\", data.id); pm.environment.set(\"trackingNumber\", data.trackingNumber); pm.environment.set(\"shipmentVersion\", data.version); }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH Advance an assigned shipment through valid states",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/shipments/{{shipmentId}}/status",
+            "description": "Advance an assigned shipment through valid states. Roles: COURIER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{courierToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PICKED_UP\",\n  \"hubId\": \"{{originHubId}}\",\n  \"note\": \"Received by named recipient\",\n  \"expectedVersion\": {{shipmentVersion}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.id) { pm.environment.set(\"shipmentId\", data.id); pm.environment.set(\"trackingNumber\", data.trackingNumber); pm.environment.set(\"shipmentVersion\", data.version); }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Cancel an unpaid shipment before pickup",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/shipments/{{shipmentId}}/cancel",
+            "description": "Cancel an unpaid shipment before pickup. Roles: CUSTOMER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Customer requested cancellation\",\n  \"expectedVersion\": {{shipmentVersion}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data.id) { pm.environment.set(\"shipmentId\", data.id); pm.environment.set(\"trackingNumber\", data.trackingNumber); pm.environment.set(\"shipmentVersion\", data.version); }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "item": [
+        {
+          "name": "GET Get own profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/users/me",
+            "description": "Get own profile. Roles: CUSTOMER, COURIER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH Update own profile",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/users/me",
+            "description": "Update own profile. Roles: CUSTOMER, COURIER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo Customer\",\n  \"phone\": \"01712345678\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "zones",
+      "item": [
+        {
+          "name": "GET List active service zones and pricing",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/zones",
+            "description": "List active service zones and pricing. Roles: CUSTOMER, COURIER, ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "if (data[0]) pm.environment.set(\"originZoneId\", data[0].id); if (data[1]) pm.environment.set(\"destinationZoneId\", data[1].id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create a service zone; prices in paisa",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/zones",
+            "description": "Create a service zone; prices in paisa. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo Customer\",\n  \"basePrice\": 6000,\n  \"perKgPrice\": 2000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(201));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH Update service zone pricing",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/zones/{{originZoneId}}",
+            "description": "Update service zone pricing. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo Customer\",\n  \"basePrice\": 6000,\n  \"perKgPrice\": 2000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Retire a zone with no active shipments or hubs",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/zones/{{originZoneId}}",
+            "description": "Retire a zone with no active shipments or hubs. Roles: ADMIN. Consult docs/API.md for business rules and workflow ordering.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected status\", () => pm.response.to.have.status(200));",
+                  "const result = pm.response.json(); pm.test(\"Structured success\", () => pm.expect(result.success).to.eql(true));",
+                  "if (result.success) { const data = result.data;",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
