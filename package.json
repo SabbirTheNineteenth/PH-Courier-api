@@ -8,7 +8,7 @@
                 },
     "scripts":  {
                     "dev":  "tsx watch src/server.ts",
-                    "build":  "prisma generate \u0026\u0026 tsc",
+                    "build":  "prisma generate \u0026\u0026 tsc \u0026\u0026 node dist/scripts/copy-doc-assets.js",
                     "start":  "node dist/src/server.js",
                     "typecheck":  "tsc --noEmit",
                     "lint":  "biome check src tests scripts prisma/seed.ts prisma.config.ts vitest.config.ts",

@@ -46,9 +46,9 @@ The official Stripe CLI is installed on this computer. Run `npm.cmd run stripe:l
 
 On 8 October 2026, an actual Stripe test-mode `customer.created` event was forwarded to `/api/v1/payments/webhook`, its signature verified, and its event ID persisted in PostgreSQL. A duplicate was acknowledged and an invalid signature rejected. The temporary test customer was deleted. This verifies local webhook connectivity and verification, not payment completion. Hosted Stripe endpoints have their own signing secrets.
 
-## Render (primary deployment path)
+## Render (alternative)
 
-1. Push this complete Git history to your own GitHub repository. Create a Render Node web service from it, or import the included `render.yaml` blueprint. The blueprint selects the free web-service plan and expects an independently supplied PostgreSQL database URL; it does not create a paid database.
+1. Push this complete Git history to your own GitHub repository. Create a Render Node web service from it, or import the included `docs/deployment/render.yaml` blueprint (set that Blueprint Path in Render). The blueprint selects the free web-service plan and expects an independently supplied PostgreSQL database URL; it does not create a paid database.
 2. Build command: `npm ci --include=dev && npm run build`. Start command: `npm run db:migrate && npm run db:seed && npm start`. Health path: `/ready`. Node: `24.15.0`.
 3. Set production `DATABASE_URL`, `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `GOOGLE_CLIENT_ID`, Stripe keys, callback URLs, and CORS origins. Use a dedicated evaluation admin. Set `NODE_ENV=production` and `TRUST_PROXY=1` behind Render's single trusted proxy.
 4. Use PostgreSQL TLS settings required by your provider. If runtime uses a pooler, set `DIRECT_URL` to its migration-capable direct connection.
@@ -57,7 +57,7 @@ On 8 October 2026, an actual Stripe test-mode `customer.created` event was forwa
 
 Reference: [Render Express deployment](https://render.com/docs/deploy-node-express-app).
 
-## Vercel (alternative)
+## Vercel (selected deployment path)
 
 The default Express export in `src/app.ts` is compatible with Vercel's Express support. Import the repository, configure the same private environment fields, and use the included `vercel.json` build/install settings. Before deploying, apply migrations and run the seed against the hosted PostgreSQL URL. Runtime connection pooling is capped at 10 per instance; use a provider pooler and appropriate concurrency settings for serverless deployments. Rate limits are per application instance, so multi-instance hosting should additionally enforce distributed limits at the platform/Redis layer.
 

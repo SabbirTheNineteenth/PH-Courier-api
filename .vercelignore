@@ -1,0 +1,11 @@
+.git/
+.local/
+.env
+.env.*
+node_modules/
+dist/
+coverage/
+tests/
+*.log
+.agents/
+skills-lock.json

@@ -1,4 +1,4 @@
-﻿# Assignment requirement audit
+# Assignment requirement audit
 
 Sources: [assignment README](https://github.com/Apollo-Level2-Web-Dev/B7A6) and [project requirements](https://github.com/Apollo-Level2-Web-Dev/B7A6/blob/main/project_requirements.md), reviewed 7 October 2026. The selected domain for last ID digit 1 is Courier & Logistics. Courier idea-hub features are starting-point suggestions; mandatory rules are enforced below.
 
@@ -43,4 +43,3 @@ The whole assignment is **not yet externally complete**. Provider credentials ar
 4. Working deployed dedicated admin credentials, published API docs link, repository URL preserving commits, and the user-produced presentation/video link.
 
 No missing credential is filled with an invented key, no deployment URL is fabricated, and no automated provider mock is described as a real payment.
-
