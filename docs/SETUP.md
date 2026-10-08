@@ -75,3 +75,9 @@ Reference: [Vercel Express support](https://vercel.com/docs/frameworks/backend/e
 - Your 5–10 minute API presentation/video and final submission links.
 
 No live API URL, Google provider success, Stripe live charge, or external CI run is claimed until actually verified.
+
+## Local Google acceptance helper
+
+Run npm run google:verify and open http://localhost:3000 on the same computer. Add http://localhost:3000 to the OAuth client's Authorized JavaScript origins. The helper uses Google's popup callback, so no authorized redirect URI is needed for this flow. It checks actual Google login against LIVE_API_URL, Bearer profile access, and repeat identity consistency, then logs out both verification sessions. Tokens are neither displayed nor written to disk. The tool binds to loopback; successful evidence is written to ignored .local/google-acceptance.json.
+
+The working evaluation admin credentials and public links are prepared privately in .local/SUBMISSION.txt. Add your video URL there before submitting; do not publish that credentials file in GitHub.
