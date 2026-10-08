@@ -52,3 +52,11 @@ Vercel production build succeeded using the compiled root app.js entrypoint. Liv
 Actual Stripe test-mode Checkout creation, amount/currency/reference matching, session reuse, unpaid verification, provider expiry webhook, retry and API-driven expiry passed against the public API and hosted database. The dedicated dashboard webhook signing secret is configured privately in Vercel. Replaying a previously received event was acknowledged as a duplicate; an invalid signature was rejected. Invalid Google identity tokens returned structured HTTP 401.
 
 Temporary acceptance accounts, addresses and shipments were archived, and refresh tokens revoked. No charge was created. Private evidence: .local/vercel-checkout-acceptance.json and .local/vercel-security-acceptance.json. Completed Stripe payment/refund and valid Google browser sign-in remain pending. Repository publication awaits the user-created repository URL.
+
+## Repository and CI acceptance: 8 October 2026
+
+The complete 36-commit backend history through cd3f1cb was pushed to https://github.com/SabbirTheNineteenth/PH-Courier-api on main. GitHub Actions run 37729966222 completed successfully for that revision: dependency installation, Prisma generation, PostgreSQL migrations, typecheck/lint/27 tests, build, generated-doc drift check, and npm audit all passed. Run evidence: https://github.com/SabbirTheNineteenth/PH-Courier-api/actions/runs/37729966222.
+
+Vercel Git connection was attempted but rejected because the project could not access the repository. The existing production API remains deployed through the authenticated CLI. Automatic Git deployments require granting Vercel access to this new repository and connecting it in the project Git settings.
+
+A real test-mode browser Checkout for 210 BDT was prepared for the final PAID/refund acceptance. Its credentials and record IDs are held only in ignored .local/payment-walkthrough.json; completion is not claimed before Stripe confirms payment.

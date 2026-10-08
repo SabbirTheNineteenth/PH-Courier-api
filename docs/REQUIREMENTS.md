@@ -28,14 +28,14 @@ Sources: [assignment README](https://github.com/Apollo-Level2-Web-Dev/B7A6) and 
 | Payment creation/success/cancellation/status | Checkout initiation/reuse, verified signed events, backend verification, unpaid session expiry/retry, paid pre-pickup refund with failure retry | Tested with real database; actual provider Checkout/expiry verified; completed payment/refund pending |
 | Complete API docs | OpenAPI request/resource schemas, validated document, 46-endpoint Postman collection/environment, generated inventory | Validation/coverage/request-template tests pass |
 | Demo admin email/password | Random private credentials in local `.env`; safe idempotent seed; working local admin login | Local and deployed admin login verified |
-| Minimum 20 meaningful backend commits | Feature-specific Git commits; `git log --oneline`, `git rev-list --count HEAD` | Satisfied locally; preserve history when pushing |
+| Minimum 20 meaningful backend commits | Feature-specific Git commits; `git log --oneline`, `git rev-list --count HEAD` | Satisfied; complete history published to the user-owned repository |
 | Working deployment/live URL | Render blueprint, Vercel native Express export/build settings, deployment instructions, live smoke helper | Deployed on Vercel with dedicated Neon PostgreSQL; live readiness/auth/docs/provider Checkout/expiry verified; Google success and paid workflow pending |
-| Tests/QA | `npm run check`, build, migration status/drift, npm audit, local runtime readiness/login | 27 local tests pass; Vercel build and public smoke/provider checks pass; GitHub CI execution pending repository publication |
+| Tests/QA | `npm run check`, build, migration status/drift, npm audit, local runtime readiness/login | 27 local tests pass; Vercel build and public smoke/provider checks pass; GitHub PostgreSQL CI passed for cd3f1cb |
 | Presentation/video | User will handle the required 5 to 10 minute API walkthrough | User-owned pending deliverable |
 
 ## Required final gates
 
-The whole assignment is **not yet externally complete**. Provider credentials and hosted API are configured. Live readiness, admin login, docs, Stripe Checkout/expiry/webhook and invalid Google rejection are verified. Complete browser payment/login and repository acceptance:
+The whole assignment is **not yet externally complete**. Provider credentials and hosted API are configured. Live readiness, admin login, docs, Stripe Checkout/expiry/webhook and invalid Google rejection are verified. Complete browser payment/login and browser identity/payment acceptance:
 
 1. Valid real GCP Google ID-token login and rejection of invalid identity tokens.
 2. Actual Stripe provider Checkout, matching amount/currency, signed webhook, backend PAID verification, duplicate handling, unpaid expiry, and eligible refund. Mocked tests do not demonstrate a live charge. If a real charge is required by evaluation, verify with an eligible activated account and live keys.

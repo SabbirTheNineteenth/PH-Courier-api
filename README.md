@@ -2,6 +2,8 @@
 
 Backend-only REST API for the B7A6 Courier & Logistics assignment (student ID last digit **1**). Customers book and pay for shipments, admins manage operations and assign couriers, and couriers record pickup, hub movement, delivery attempts, and returns.
 
+Repository: https://github.com/SabbirTheNineteenth/PH-Courier-api. Full feature commit history is preserved. GitHub PostgreSQL CI passed for revision cd3f1cb on 8 October 2026.
+
 **Hosted API:** https://ph-courier-backend.vercel.app — API docs: https://ph-courier-backend.vercel.app/docs/. The Vercel API uses a dedicated Neon PostgreSQL database. Readiness, deployed admin login, access controls and Swagger assets passed live checks on 8 October 2026. Local tests pass (27 tests). Browser Google sign-in and completed Stripe payment/refund acceptance remain pending; test Checkout creation/expiry does not prove a live charge.
 
 ## Start on this computer
