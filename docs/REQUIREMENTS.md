@@ -27,19 +27,19 @@ Sources: [assignment README](https://github.com/Apollo-Level2-Web-Dev/B7A6) and 
 | Real gateway integration | Actual Stripe SDK Checkout/API verification/raw signature checks/refunds, provider idempotency; no fake production payment route | Actual test-mode Checkout creation/reuse, provider verification, signed expiry webhook and retry verified; completed payment/refund pending |
 | Payment creation/success/cancellation/status | Checkout initiation/reuse, verified signed events, backend verification, unpaid session expiry/retry, paid pre-pickup refund with failure retry | Tested with real database; actual provider Checkout/expiry verified; completed payment/refund pending |
 | Complete API docs | OpenAPI request/resource schemas, validated document, 46-endpoint Postman collection/environment, generated inventory | Validation/coverage/request-template tests pass |
-| Demo admin email/password | Random private credentials in local `.env`; safe idempotent seed; working local admin login | Local verified; deployed login pending |
+| Demo admin email/password | Random private credentials in local `.env`; safe idempotent seed; working local admin login | Local and deployed admin login verified |
 | Minimum 20 meaningful backend commits | Feature-specific Git commits; `git log --oneline`, `git rev-list --count HEAD` | Satisfied locally; preserve history when pushing |
-| Working deployment/live URL | Render blueprint, Vercel native Express export/build settings, deployment instructions, live smoke helper | Prepared; actual hosted URL/acceptance pending your account setup |
-| Tests/QA | `npm run check`, build, migration status/drift, npm audit, local runtime readiness/login | Local verified; external CI/live runs pending |
-| Presentation/video | User will handle the required 5â€“10 minute API walkthrough | User-owned pending deliverable |
+| Working deployment/live URL | Render blueprint, Vercel native Express export/build settings, deployment instructions, live smoke helper | Deployed on Vercel with dedicated Neon PostgreSQL; live readiness/auth/docs/provider Checkout/expiry verified; Google success and paid workflow pending |
+| Tests/QA | `npm run check`, build, migration status/drift, npm audit, local runtime readiness/login | 27 local tests pass; Vercel build and public smoke/provider checks pass; GitHub CI execution pending repository publication |
+| Presentation/video | User will handle the required 5 to 10 minute API walkthrough | User-owned pending deliverable |
 
 ## Required final gates
 
-The whole assignment is **not yet externally complete**. Provider credentials are configured locally. Complete browser payment/login acceptance and hosting, then verify:
+The whole assignment is **not yet externally complete**. Provider credentials and hosted API are configured. Live readiness, admin login, docs, Stripe Checkout/expiry/webhook and invalid Google rejection are verified. Complete browser payment/login and repository acceptance:
 
 1. Valid real GCP Google ID-token login and rejection of invalid identity tokens.
 2. Actual Stripe provider Checkout, matching amount/currency, signed webhook, backend PAID verification, duplicate handling, unpaid expiry, and eligible refund. Mocked tests do not demonstrate a live charge. If a real charge is required by evaluation, verify with an eligible activated account and live keys.
-3. A working hosted HTTPS API connected to PostgreSQL; run `npm run smoke:live` against that URL and complete role/workflow checks there.
+3. Hosted readiness, admin authentication, private-route protection, docs and unpaid payment workflow passed at https://ph-courier-backend.vercel.app. Complete the paid courier/delivery/refund walkthrough there.
 4. Working deployed dedicated admin credentials, published API docs link, repository URL preserving commits, and the user-produced presentation/video link.
 
 No missing credential is filled with an invented key, no deployment URL is fabricated, and no automated provider mock is described as a real payment.

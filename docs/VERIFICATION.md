@@ -41,3 +41,14 @@ Expiring the first session directly through Stripe caused the actual signed `che
 Both sessions remain expired at the provider. The temporary account, addresses, and cancelled shipment were soft-deleted through the API, and refresh tokens were revoked. No payment/charge was created. Private machine-readable evidence: `.local/stripe-checkout-acceptance.json`.
 
 Real browser Google login, completed Stripe test-card payment and eligible refund, public deployment, and repository publication still require acceptance. Local webhook and Checkout creation/expiry are now verified against the actual provider.
+
+
+## Vercel acceptance update: 8 October 2026
+
+Public API: https://ph-courier-backend.vercel.app. Public docs: https://ph-courier-backend.vercel.app/docs/. Dedicated Vercel project: ph-courier-backend. Database: a separate Neon Free-plan PostgreSQL database in Singapore. Both migrations and the dedicated admin/zone/hub seed completed against that database.
+
+Vercel production build succeeded using the compiled root app.js entrypoint. Live database readiness, OpenAPI, deployed admin login/permissions, unauthenticated rejection and logout passed. Swagger HTML, CSS, JavaScript bundles and initialization script returned HTTP 200 with appropriate asset content types.
+
+Actual Stripe test-mode Checkout creation, amount/currency/reference matching, session reuse, unpaid verification, provider expiry webhook, retry and API-driven expiry passed against the public API and hosted database. The dedicated dashboard webhook signing secret is configured privately in Vercel. Replaying a previously received event was acknowledged as a duplicate; an invalid signature was rejected. Invalid Google identity tokens returned structured HTTP 401.
+
+Temporary acceptance accounts, addresses and shipments were archived, and refresh tokens revoked. No charge was created. Private evidence: .local/vercel-checkout-acceptance.json and .local/vercel-security-acceptance.json. Completed Stripe payment/refund and valid Google browser sign-in remain pending. Repository publication awaits the user-created repository URL.

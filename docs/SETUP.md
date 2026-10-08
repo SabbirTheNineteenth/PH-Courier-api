@@ -59,9 +59,9 @@ Reference: [Render Express deployment](https://render.com/docs/deploy-node-expre
 
 ## Vercel (selected deployment path)
 
-The default Express export in `src/app.ts` is compatible with Vercel's Express support. Import the repository, configure the same private environment fields, and use the included `vercel.json` build/install settings. Before deploying, apply migrations and run the seed against the hosted PostgreSQL URL. Runtime connection pooling is capped at 10 per instance; use a provider pooler and appropriate concurrency settings for serverless deployments. Rate limits are per application instance, so multi-instance hosting should additionally enforce distributed limits at the platform/Redis layer.
+Root `app.js` exports the compiled Express application from `dist/src/app.js` for Vercel. This avoids differing TypeScript module-resolution behavior in Vercel's framework compiler. The build copies Swagger assets to `public/docs`, since Vercel serves static assets through its CDN. Import the repository, configure the same private environment fields, and use the included `vercel.json` build/install settings. Before deploying, apply migrations and run the seed against the hosted PostgreSQL URL. Runtime connection pooling is capped at 10 per instance; use a provider pooler and appropriate concurrency settings for serverless deployments. Rate limits are per application instance, so multi-instance hosting should additionally enforce distributed limits at the platform/Redis layer.
 
-Set the callback/webhook URLs to the deployed HTTPS origin and rerun live acceptance. This path has configuration files but has not been externally deployed or verified without your account credentials.
+Set the callback/webhook URLs to the deployed HTTPS origin and rerun live acceptance. The dedicated project is deployed at https://ph-courier-backend.vercel.app and connected to its own Neon Free-plan database in Singapore. Production credentials are configured privately in Vercel. A dedicated Stripe test-mode webhook points to the hosted endpoint; its signing secret differs from the local CLI secret.
 
 Reference: [Vercel Express support](https://vercel.com/docs/frameworks/backend/express).
 

@@ -2,7 +2,7 @@
 
 Backend-only REST API for the B7A6 Courier & Logistics assignment (student ID last digit **1**). Customers book and pay for shipments, admins manage operations and assign couriers, and couriers record pickup, hub movement, delivery attempts, and returns.
 
-**Current local status:** implementation, migrations, local PostgreSQL, demo admin, API documentation, and automated checks are ready. Your Google/Stripe credentials and hosted API are still required for external acceptance. Tests mock external providers; they do not prove a live Google sign-in or Stripe charge.
+**Hosted API:** https://ph-courier-backend.vercel.app — API docs: https://ph-courier-backend.vercel.app/docs/. The Vercel API uses a dedicated Neon PostgreSQL database. Readiness, deployed admin login, access controls and Swagger assets passed live checks on 8 October 2026. Local tests pass (27 tests). Browser Google sign-in and completed Stripe payment/refund acceptance remain pending; test Checkout creation/expiry does not prove a live charge.
 
 ## Start on this computer
 
@@ -87,7 +87,7 @@ GitHub Actions performs migrations, type/lint/API tests, build, documentation dr
 
 ## Deployment and submission
 
-Render configuration is in `render.yaml`; Vercel recognizes the default Express export in `src/app.ts`, with build settings in `vercel.json`. These files prepare deployment; they are not a deployed live URL. For Vercel, run migrations and seeding against the hosted database before deploying, using its private environment configuration. Render's start command performs both before starting the server.
+Render configuration is in `docs/deployment/render.yaml`. Vercel uses root `app.js` to export the compiled Express application, with build settings in `vercel.json`. Swagger assets are copied to `public/docs` during the build for Vercel CDN serving. For Vercel, run migrations and seeding against the hosted database before deploying, using its private environment configuration. Render's start command performs both before starting the server.
 
 After deployment, set `LIVE_API_URL` privately and run `npm.cmd run smoke:live`. This checks live readiness, docs, admin login/permissions, and unauthenticated protection. Complete actual Google sign-in and Stripe Checkout/payment/refund checks as described in [SETUP.md](docs/SETUP.md).
 
