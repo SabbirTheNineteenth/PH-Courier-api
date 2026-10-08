@@ -24,21 +24,21 @@ Sources: [assignment README](https://github.com/Apollo-Level2-Web-Dev/B7A6) and 
 | Critical audit/activity records | Transactional AuditLog plus ShipmentEvent history for accounts/access/resources/payment/workflow | Tested |
 | Security | Argon2id; no privileged public registration; current-account checks; safe selects; Helmet; CORS allowlist; body/request/auth limits | Role, ownership, token, suspension, CORS/header tests pass |
 | Performance/code quality | Indexed Prisma queries, selected private user fields, bounded lists, modular services, Biome, optional Redis zone cache | Build/typecheck/lint pass; optional Redis instance not configured locally |
-| Real gateway integration | Actual Stripe SDK Checkout/API verification/raw signature checks/refunds, provider idempotency; no fake production payment route | Actual Stripe test Checkout payment and full refund, hosted signed webhooks, audit idempotency, expiry and retry verified; evaluation acceptance of test mode pending confirmation |
+| Real gateway integration | Actual Stripe SDK Checkout/API verification/raw signature checks/refunds, provider idempotency; no fake production payment route | Actual Stripe test Checkout payment and full refund, hosted signed webhooks, audit idempotency, expiry and retry verified; test mode explicitly accepted by the user on 8 October 2026 |
 | Payment creation/success/cancellation/status | Checkout initiation/reuse, verified signed events, backend verification, unpaid session expiry/retry, paid pre-pickup refund with failure retry | Actual provider test payment/refund and public paid assignment verified; database integration tests cover delivery/return workflows |
 | Complete API docs | OpenAPI request/resource schemas, validated document, 46-endpoint Postman collection/environment, generated inventory | Validation/coverage/request-template tests pass |
 | Demo admin email/password | Random private credentials in local `.env`; safe idempotent seed; working local admin login | Local and deployed admin login verified |
 | Minimum 20 meaningful backend commits | Feature-specific Git commits; `git log --oneline`, `git rev-list --count HEAD` | Satisfied; complete history published to the user-owned repository |
 | Working deployment/live URL | Render blueprint, Vercel native Express export/build settings, deployment instructions, live smoke helper | Deployed on Vercel with dedicated Neon PostgreSQL; live readiness/auth/docs/provider Checkout/expiry verified; actual Google login and paid assignment/refund verified in Stripe test mode |
-| Tests/QA | `npm run check`, build, migration status/drift, npm audit, local runtime readiness/login | 27 local tests pass; Vercel build and public smoke/provider checks pass; GitHub PostgreSQL CI passed for cd3f1cb |
+| Tests/QA | `npm run check`, build, migration status/drift, npm audit, local runtime readiness/login | 27 local tests pass; Vercel build and public smoke/provider checks pass; GitHub PostgreSQL CI passed for f93395a (run 37731109454) |
 | Presentation/video | User will handle the required 5 to 10 minute API walkthrough | User-owned pending deliverable |
 
-## Required final gates
+## Backend completion audit
 
-Backend implementation, deployment, repository, documentation, actual Google login, and provider test payment/refund acceptance are verified. The assignment forbids simulated/fake payments; confirm the permitted provider evaluation mode before treating the complete assignment as accepted. The user owns the presentation/video.
+All backend deliverables are verified. The user explicitly accepted Stripe test mode on 8 October 2026. Payments are processed by the actual Stripe provider, with signed events and API verification; there is no manual paid-status route. No live-money transaction is claimed. Presentation/video remains owned by the user and is outside the completed backend work.
 
 1. Actual Google ID-token login and invalid-token rejection passed against the public API.
-2. Actual Stripe test provider Checkout, matching amount/currency, signed webhooks, PAID verification, duplicate handling, unpaid expiry and full pre-pickup refund passed. No live-money transaction is claimed. Confirm whether the instructor accepts Stripe test mode; if live processing is required, the evaluation account must be activated with appropriate live keys and permitted transaction details.
+2. Actual Stripe test provider Checkout, matching amount/currency, signed webhooks, PAID verification, duplicate handling, unpaid expiry and full pre-pickup refund passed. Stripe test mode is the user-approved evaluation mode. No live-money transaction is claimed.
 3. Hosted readiness, admin authentication, private-route protection, docs and unpaid payment workflow passed at https://ph-courier-backend.vercel.app. Paid courier assignment/access and actual provider test refund also passed; full delivery/return transitions are covered by PostgreSQL integration tests.
 4. Deployed admin credentials and public repository/API/docs links are prepared in private .local/SUBMISSION.txt. The user must add the presentation/video URL.
 
