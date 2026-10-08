@@ -23,3 +23,11 @@ The isolated development database is `courier`; automated tests use and clear `c
 External Google and Stripe calls are mocked inside automated tests. The production code calls the actual provider libraries and has no fake-payment route. Real GCP login, Stripe provider payment/refund, public deployment, and external CI execution remain unverified until credentials/hosting are configured. Optional Redis is implemented but no live Redis instance is configured locally.
 
 Refer to [REQUIREMENTS.md](REQUIREMENTS.md) for the complete requirement audit and [SETUP.md](SETUP.md) for the remaining account/deployment checks. The presentation/video is user-owned.
+
+## Webhook verification update: 8 October 2026
+
+Google client ID, Stripe test-mode secret key, and Stripe CLI signing secret are configured privately. The hidden Stripe listener is forwarding to the local API, and the API was restarted to load the configured values.
+
+Actual Stripe test-mode event forwarding, signature verification, database event recording, duplicate acknowledgment, and invalid-signature rejection passed. Only a temporary test customer was created and cleaned up; no payment/charge was created. Machine-readable evidence is saved privately under `.local/webhook-connectivity.json`. Run `npm.cmd run stripe:listen` to restart forwarding after a computer restart.
+
+Actual Google identity login, Stripe Checkout/payment/refund completion, and public hosting acceptance remain separate pending checks. The local CLI secret applies to local forwarding; use the deployed endpoint's own signing secret for hosting.

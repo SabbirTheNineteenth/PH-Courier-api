@@ -21,7 +21,8 @@
                     "check":  "npm run typecheck \u0026\u0026 npm run lint \u0026\u0026 npm test",
                     "config:check":  "tsx scripts/check-config.ts",
                     "smoke:live":  "tsx scripts/smoke-live.ts",
-                    "start:local":  "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-local.ps1"
+                    "start:local":  "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-local.ps1",
+                    "stripe:listen":  "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-stripe.ps1"
                 },
     "dependencies":  {
                          "@prisma/adapter-pg":  "^7.0.0",

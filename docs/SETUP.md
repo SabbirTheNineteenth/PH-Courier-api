@@ -40,6 +40,12 @@ Reference: [Google server-side ID-token verification](https://developers.google.
 
 References: [Stripe webhooks](https://docs.stripe.com/webhooks), [Stripe testing](https://docs.stripe.com/testing).
 
+### Local listener helper
+
+The official Stripe CLI is installed on this computer. Run `npm.cmd run stripe:listen` in the project folder to start the hidden local listener using the private `STRIPE_SECRET_KEY`. The helper captures the real CLI signing secret directly into `.env`, keeps logs/process state under gitignored `.local`, and never prints credentials. If it reports a changed secret, restart the API to load it. Restart the listener after restarting the computer; it must be running to forward local events.
+
+On 8 October 2026, an actual Stripe test-mode `customer.created` event was forwarded to `/api/v1/payments/webhook`, its signature verified, and its event ID persisted in PostgreSQL. A duplicate was acknowledged and an invalid signature rejected. The temporary test customer was deleted. This verifies local webhook connectivity and verification, not payment completion. Hosted Stripe endpoints have their own signing secrets.
+
 ## Render (primary deployment path)
 
 1. Push this complete Git history to your own GitHub repository. Create a Render Node web service from it, or import the included `render.yaml` blueprint. The blueprint selects the free web-service plan and expects an independently supplied PostgreSQL database URL; it does not create a paid database.
